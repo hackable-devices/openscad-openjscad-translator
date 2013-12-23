@@ -23,6 +23,59 @@ define("PrimitiveModules", ["Globals", "Context"], function(Globals, Context){
         return _.template('CSG.sphere({center: [<%=String(center)%>], radius: <%= radius %>, resolution: <%= resolution%>})', openjscadParameters);
     }
 
+    function Write(a) {
+        PrimitiveModule.call(this, a);
+    };
+
+    Write.prototype.evaluate = function(parentContext, inst) {
+        var context = new Context(parentContext);
+
+        var argnames = ["text"];
+        var argexpr = inst.argexpr;
+
+        context.args(argnames, argexpr, inst.argnames, inst.argvalues);
+
+        var text = inst.argvalues[0];
+        return _.template('CSG.write("<%=String(text)%>")', {text:text});
+    }
+
+    function Surface(a) {
+        PrimitiveModule.call(this, a);
+    };
+
+    Surface.prototype.evaluate = function(parentContext, inst) {
+        var context = new Context(parentContext);
+
+        var argnames = ["file", "center", "convexity"];
+        var argexpr = inst.argexpr;
+
+        context.args(argnames, argexpr, inst.argnames, inst.argvalues);
+
+        var file = Context.contextVariableLookup(context, "file", undefined);
+        var center = Context.contextVariableLookup(context, "center", true);
+        var convexity = Context.contextVariableLookup(context, "convexity", 5);
+
+        var openjscadParameters = {file:argexpr[0].var_name, center:center, convexity:convexity};
+
+        return _.template('CSG.surface({polyhedron: "<%= file %>", center: <%= center %>, convexity: <%= convexity %>})', openjscadParameters);
+    }
+
+    function BuildPlate(a) {
+        PrimitiveModule.call(this, a);
+    };
+
+    BuildPlate.prototype.evaluate = function(parentContext, inst) {
+        var context = new Context(parentContext);
+
+        var argnames = [];
+        var argexpr = inst.argexpr;
+
+        context.args(argnames, argexpr, inst.argnames, inst.argvalues);
+
+        var bp = inst.argvalues[0];
+        return _.template('build_plate(<%= bp %>)', {bp:bp});
+    }
+
     function Cylinder(a){
       PrimitiveModule.call(this, a);
     };
@@ -209,8 +262,6 @@ define("PrimitiveModules", ["Globals", "Context"], function(Globals, Context){
         return _.template("CSG.fromPolygons([<%=polygons%>])", {polygons:polygons});   
     };
 
-
-
     return {
     	Sphere: Sphere,
     	Cube: Cube,
@@ -218,7 +269,10 @@ define("PrimitiveModules", ["Globals", "Context"], function(Globals, Context){
     	Circle: Circle,
     	Square: Square,
     	Polygon: Polygon,
-    	Polyhedron: Polyhedron
+    	Polyhedron: Polyhedron,
+        Surface: Surface,
+        Write: Write,
+        BuildPlate: BuildPlate
     }
 
 });

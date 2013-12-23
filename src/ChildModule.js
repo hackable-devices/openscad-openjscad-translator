@@ -33,7 +33,9 @@ define("ChildModule", ["Globals", "Context"], function(Globals, Context){
                     });
 
                     var childAdaptor = this.factory.getAdaptor(childInst);
+                    //if (ctx.inst_p.ctx !== undefined) {
                     evaluatedChildren.push(childAdaptor.evaluate(ctx.inst_p.ctx, childInst));
+                    //}
 
                 }
                 return evaluatedChildren;
